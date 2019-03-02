@@ -1,19 +1,21 @@
-#define FASTLED_INTERNAL
-#define FASTLED_INTERRUPT_RETRY_COUNT 0
+//#define FASTLED_INTERRUPT_RETRY_COUNT 0
 #include "FastLED.h"
 
 //*******************************************************************************
 // Config
 //*******************************************************************************
-#define NUM_LEDS 2 // Number of LEDS in your strip
+#define NUM_LEDS 20 // Number of LEDS in your strip
 #define DATA_PIN 5 // Pin 5 on ESP8266
 #define buttonPin 12     // Pin 6 on ESP8266
+#define ANALOG_READ 17 //The pin that we read sensor values form
 #define DELAY 1 //Arduino loop delay
+
+#define MIC_LOW 500
+#define MIC_HIGH 1024
 
 // Globals
 CRGB leds[NUM_LEDS]; // LED array
-int buttonState = 0;         // variable for reading the pushbutton status
-bool ledState = false; // are leds On or Off
+bool powerOn = false; // are leds On or Off
 
 //*******************************************************************************
 // Setup
@@ -21,40 +23,45 @@ bool ledState = false; // are leds On or Off
 void setup() { 
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(50);
-  setRGB(255,0,0);
-  //Serial.begin(115200);
-  //Serial.println("LOW");
+  setRGB(0,0,0);
+  Serial.begin(115200);
   pinMode(buttonPin, INPUT);
 }
 
 //*******************************************************************************
 // Loop
 //*******************************************************************************
-void loop() { 
-  // read the state of the pushbutton value:
-  buttonState = digitalRead(buttonPin);
-  if (buttonState == HIGH) {
-    // turn LED on:
-    leds[1] = CRGB::Green;
-    FastLED.show();
-  } else {
-    // turn LED off:
-    leds[1] = CRGB::Black;
-    FastLED.show();
-  }
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+void loop() 
+{
+   unsigned long startMillis= millis();  // Start of sample window
+   unsigned int peakToPeak = 0;   // peak-to-peak level
 
-  if(shouldUpdate()) {
-    if(ledState){
-      leds[0] = CRGB::Black;
-      FastLED.show();
-      ledState = false;
-    } else {
-      leds[0] = CRGB::Red;
-      FastLED.show();
-      ledState = true;
-    }
-  }
-  delay(DELAY);       // delay in between reads for stability
+   unsigned int signalMax = 0;
+   unsigned int signalMin = 1024;
+
+   // collect data for 50 mS
+   while (millis() - startMillis < sampleWindow)
+   {
+      sample = analogRead(17);
+      if (sample < 1024)  // toss out spurious readings
+      {
+         if (sample > signalMax)
+         {
+            signalMax = sample;  // save just the max levels
+         }
+         else if (sample < signalMin)
+         {
+            signalMin = sample;  // save just the min levels
+         }
+      }
+   }
+   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+   double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
+
+   Serial.println(peakToPeak);
+   handleToggle();
 }
 
 //*******************************************************************************
@@ -80,3 +87,41 @@ bool shouldUpdate()
   }
   return false;
 }
+
+long lastShow = 0;
+bool shouldShow()
+{
+  int updateThreshold = 1000/60;
+  long now = millis();
+
+  if (now - lastShow > updateThreshold)
+  {
+    lastShow = now;
+    return true;
+  }
+  return false;
+}
+
+int reading;           // the current reading from the input pin
+int previous = LOW;    // the previous reading from the input pin
+long debounceStart = 0;         // the last time the output pin was toggled
+long debounce = 200;   // the debounce time, increase if the output flickers
+void handleToggle() {
+  reading = digitalRead(buttonPin);
+  // if the input just went from LOW and HIGH and we've waited long enough
+  // to ignore any noise on the circuit, toggle the output pin and remember
+  // the time
+  if (reading == HIGH && previous == LOW && millis() - debounceStart > debounce) {
+    if(powerOn){
+      setRGB(0,0,0);
+      powerOn = false;
+    } else {
+      setRGB(255,0,0);
+      powerOn = true;
+    }
+
+    debounceStart = millis();    
+  }
+  previous = reading;
+}
+
