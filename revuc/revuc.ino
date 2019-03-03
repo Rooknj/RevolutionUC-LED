@@ -3,10 +3,10 @@
 //*******************************************************************************
 // Config
 //*******************************************************************************
-#define NUM_LEDS 60 // Number of LEDS in your strip
-#define NUM_LEDS_HALF (NUM_LEDS/2) // Half the number of LEDS in your strip
+#define NUM_LEDS 60                  // Number of LEDS in your strip
+#define NUM_LEDS_HALF (NUM_LEDS / 2) // Half the number of LEDS in your strip
 
-#define DATA_PIN 5  // Pin 5 on ESP8266
+#define DATA_PIN 5 // Pin 5 on ESP8266
 #define buttonPin 6
 #define ANALOG_READ A5     //The pin that we read sensor values form
 #define DC_OFFSET 0        // DC offset in mic signal - if unusure, leave 0
@@ -14,15 +14,15 @@
 #define TOP (NUM_LEDS + 2) // Allow dot to go slightly off scale
 #define SAMPLES 60         // Length of buffer for dynamic level adjustment
 #define PEAK_FALL 40       // Rate of peak falling dot
-#define SPEED .20       // Amount to increment RGB color by each cycle
+#define SPEED .20          // Amount to increment RGB color by each cycle
 
 // Globals
 byte
-    peak = 0,        // Used for falling dot
-    height = 0;      // Used for the body of the animation (current sound level)
+    peak = 0,   // Used for falling dot
+    height = 0; // Used for the body of the animation (current sound level)
 float
-  greenOffset = 30,
-  blueOffset = 150;
+    greenOffset = 30,
+    blueOffset = 150;
 
 CRGB leds[NUM_LEDS]; // LED array
 int mode = 1;
@@ -83,148 +83,175 @@ void vu()
     if (i >= height)
       leds[i] = CRGB(0, 0, 0);
     else
-      leds[i] = getColorFromWheel(map(i, 0, NUM_LEDS-1, 30, 150));
+      leds[i] = getColorFromWheel(map(i, 0, NUM_LEDS - 1, 30, 150));
   }
   // Draw peak dot
   if (peak > 0 && peak <= NUM_LEDS - 1)
-    leds[peak] = getColorFromWheel(map(peak, 0, NUM_LEDS-1, 30, 150));
+    leds[peak] = getColorFromWheel(map(peak, 0, NUM_LEDS - 1, 30, 150));
   FastLED.show(); // Update strip
 }
 
-void vu2() {
+void vu2()
+{
   calculatePeakAndHeight(TOP);
-  
+
   greenOffset += SPEED;
   blueOffset += SPEED;
-  if (greenOffset >= 255) greenOffset = 0;
-  if (blueOffset >= 255) blueOffset = 0;
+  if (greenOffset >= 255)
+    greenOffset = 0;
+  if (blueOffset >= 255)
+    blueOffset = 0;
 
   // Color pixels based on rainbow gradient
-  for (int i = 0; i < NUM_LEDS; i++) {
-    if (i >= height) {
-      leds[i] = CRGB(0,0,0);
-    } else {
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
+    if (i >= height)
+    {
+      leds[i] = CRGB(0, 0, 0);
+    }
+    else
+    {
       leds[i] = getColorFromWheel(
-        map(i, 0, NUM_LEDS - 1, (int)greenOffset, (int)blueOffset)
-      );
+          map(i, 0, NUM_LEDS - 1, (int)greenOffset, (int)blueOffset));
     }
   }
-  // Draw peak dot  
-  if(peak > 0 && peak <= NUM_LEDS-1) leds[peak] = getColorFromWheel(map(peak,0,NUM_LEDS-1,30,150));
-  
-   FastLED.show(); // Update strip
+  // Draw peak dot
+  if (peak > 0 && peak <= NUM_LEDS - 1)
+    leds[peak] = getColorFromWheel(map(peak, 0, NUM_LEDS - 1, 30, 150));
+
+  FastLED.show(); // Update strip
 }
 
 void vu3()
 {
-  calculatePeakAndHeight(TOP/2);
-  for(int i=0; i<NUM_LEDS_HALF; i++) {
-    if(i >= height) {              
-      leds[NUM_LEDS_HALF-i-1] = CRGB(0, 0, 0);
-      leds[NUM_LEDS_HALF+i] = CRGB(0, 0, 0);
+  calculatePeakAndHeight(TOP / 2);
+  for (int i = 0; i < NUM_LEDS_HALF; i++)
+  {
+    if (i >= height)
+    {
+      leds[NUM_LEDS_HALF - i - 1] = CRGB(0, 0, 0);
+      leds[NUM_LEDS_HALF + i] = CRGB(0, 0, 0);
     }
-    else {
-      CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,30,150));
-      leds[NUM_LEDS_HALF-i-1] = color;
-      leds[NUM_LEDS_HALF+i] = color;
+    else
+    {
+      CRGB color = getColorFromWheel(map(i, 0, NUM_LEDS_HALF - 1, 30, 150));
+      leds[NUM_LEDS_HALF - i - 1] = color;
+      leds[NUM_LEDS_HALF + i] = color;
     }
   }
- 
-  // Draw peak dot  
-  if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
-    CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,30,150));
-    leds[NUM_LEDS_HALF-peak-1] = color;
-    leds[NUM_LEDS_HALF+peak] = color;
+
+  // Draw peak dot
+  if (peak > 0 && peak <= NUM_LEDS_HALF - 1)
+  {
+    CRGB color = getColorFromWheel(map(peak, 0, NUM_LEDS_HALF - 1, 30, 150));
+    leds[NUM_LEDS_HALF - peak - 1] = color;
+    leds[NUM_LEDS_HALF + peak] = color;
   }
-  
-   FastLED.show(); // Update strip
+
+  FastLED.show(); // Update strip
 }
 
 void vu4()
 {
-  calculatePeakAndHeight(TOP/2);
+  calculatePeakAndHeight(TOP / 2);
 
   greenOffset += SPEED;
   blueOffset += SPEED;
-  if (greenOffset >= 255) greenOffset = 0;
-  if (blueOffset >= 255) blueOffset = 0;
-  
-  for(int i=0; i<NUM_LEDS_HALF; i++) {
-    if(i >= height) {              
-      leds[NUM_LEDS_HALF-i-1] = CRGB(0, 0, 0);
-      leds[NUM_LEDS_HALF+i] = CRGB(0, 0, 0);
+  if (greenOffset >= 255)
+    greenOffset = 0;
+  if (blueOffset >= 255)
+    blueOffset = 0;
+
+  for (int i = 0; i < NUM_LEDS_HALF; i++)
+  {
+    if (i >= height)
+    {
+      leds[NUM_LEDS_HALF - i - 1] = CRGB(0, 0, 0);
+      leds[NUM_LEDS_HALF + i] = CRGB(0, 0, 0);
     }
-    else {
-      CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-      leds[NUM_LEDS_HALF-i-1] = color;
-      leds[NUM_LEDS_HALF+i] = color;
+    else
+    {
+      CRGB color = getColorFromWheel(map(i, 0, NUM_LEDS_HALF - 1, (int)greenOffset, (int)blueOffset));
+      leds[NUM_LEDS_HALF - i - 1] = color;
+      leds[NUM_LEDS_HALF + i] = color;
     }
   }
- 
-  // Draw peak dot  
-  if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
-    CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-    leds[NUM_LEDS_HALF-peak-1] = color;
-    leds[NUM_LEDS_HALF+peak] = color;
+
+  // Draw peak dot
+  if (peak > 0 && peak <= NUM_LEDS_HALF - 1)
+  {
+    CRGB color = getColorFromWheel(map(peak, 0, NUM_LEDS_HALF - 1, (int)greenOffset, (int)blueOffset));
+    leds[NUM_LEDS_HALF - peak - 1] = color;
+    leds[NUM_LEDS_HALF + peak] = color;
   }
-  
-   FastLED.show(); // Update strip
+
+  FastLED.show(); // Update strip
 }
 
 void vu5()
 {
-  calculatePeakAndHeight(TOP/2);
-  for(int i=0; i<NUM_LEDS_HALF; i++) {
-    if(i >= height) {              
-      leds[NUM_LEDS-i-1] = CRGB(0, 0, 0);
+  calculatePeakAndHeight(TOP / 2);
+  for (int i = 0; i < NUM_LEDS_HALF; i++)
+  {
+    if (i >= height)
+    {
+      leds[NUM_LEDS - i - 1] = CRGB(0, 0, 0);
       leds[i] = CRGB(0, 0, 0);
     }
-    else {
-      CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,30,150));
-      leds[NUM_LEDS-i-1] = color;
+    else
+    {
+      CRGB color = getColorFromWheel(map(i, 0, NUM_LEDS_HALF - 1, 30, 150));
+      leds[NUM_LEDS - i - 1] = color;
       leds[i] = color;
     }
   }
- 
-  // Draw peak dot  
-  if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
-    CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,30,150));
-    leds[NUM_LEDS-peak-1] = color;
+
+  // Draw peak dot
+  if (peak > 0 && peak <= NUM_LEDS_HALF - 1)
+  {
+    CRGB color = getColorFromWheel(map(peak, 0, NUM_LEDS_HALF - 1, 30, 150));
+    leds[NUM_LEDS - peak - 1] = color;
     leds[peak] = color;
   }
-  
-   FastLED.show(); // Update strip
+
+  FastLED.show(); // Update strip
 }
 
 void vu6()
 {
-  calculatePeakAndHeight(TOP/2);
+  calculatePeakAndHeight(TOP / 2);
 
   greenOffset += SPEED;
   blueOffset += SPEED;
-  if (greenOffset >= 255) greenOffset = 0;
-  if (blueOffset >= 255) blueOffset = 0;
-  
-  for(int i=0; i<NUM_LEDS_HALF; i++) {
-    if(i >= height) {              
-      leds[NUM_LEDS-i-1] = CRGB(0, 0, 0);
+  if (greenOffset >= 255)
+    greenOffset = 0;
+  if (blueOffset >= 255)
+    blueOffset = 0;
+
+  for (int i = 0; i < NUM_LEDS_HALF; i++)
+  {
+    if (i >= height)
+    {
+      leds[NUM_LEDS - i - 1] = CRGB(0, 0, 0);
       leds[i] = CRGB(0, 0, 0);
     }
-    else {
-      CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-      leds[NUM_LEDS-i-1] = color;
+    else
+    {
+      CRGB color = getColorFromWheel(map(i, 0, NUM_LEDS_HALF - 1, (int)greenOffset, (int)blueOffset));
+      leds[NUM_LEDS - i - 1] = color;
       leds[i] = color;
     }
   }
- 
-  // Draw peak dot  
-  if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
-    CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-    leds[NUM_LEDS-peak-1] = color;
+
+  // Draw peak dot
+  if (peak > 0 && peak <= NUM_LEDS_HALF - 1)
+  {
+    CRGB color = getColorFromWheel(map(peak, 0, NUM_LEDS_HALF - 1, (int)greenOffset, (int)blueOffset));
+    leds[NUM_LEDS - peak - 1] = color;
     leds[peak] = color;
   }
-  
-   FastLED.show(); // Update strip
+
+  FastLED.show(); // Update strip
 }
 
 void setRGB(uint8_t p_red, uint8_t p_green, uint8_t p_blue)
@@ -236,16 +263,20 @@ void setRGB(uint8_t p_red, uint8_t p_green, uint8_t p_blue)
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
-CRGB getColorFromWheel(byte WheelPos) {
-  
-  if(WheelPos < 85) {
+CRGB getColorFromWheel(byte WheelPos)
+{
+
+  if (WheelPos < 85)
+  {
     return CRGB((WheelPos * 3), (255 - WheelPos * 3), 0);
-  } 
-  else if(WheelPos < 170) {
+  }
+  else if (WheelPos < 170)
+  {
     WheelPos -= 85;
     return CRGB((255 - WheelPos * 3), 0, (WheelPos * 3));
-  } 
-  else {
+  }
+  else
+  {
     WheelPos -= 170;
     return CRGB(0, (WheelPos * 3), (255 - WheelPos * 3));
   }
