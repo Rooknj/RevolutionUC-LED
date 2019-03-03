@@ -29,8 +29,12 @@ void setup() {
 
 void loop() 
 {
-   Serial.println(getMicSample());
-   handleToggle();
+  unsigned int micSample = getMicSample();
+  unsigned int brightness = map(micSample, 13 , 756, 0, 255);
+  FastLED.setBrightness(brightness);
+  FastLED.show();
+  Serial.println(brightness);
+  handleToggle();
 }
 
 //*******************************************************************************
