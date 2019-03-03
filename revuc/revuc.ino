@@ -176,21 +176,21 @@ void vu5()
   calculatePeakAndHeight(TOP/2);
   for(int i=0; i<NUM_LEDS_HALF; i++) {
     if(i >= height) {              
-      leds[NUM_LEDS_HALF-i-1] = CRGB(0, 0, 0);
-      leds[NUM_LEDS_HALF+i] = CRGB(0, 0, 0);
+      leds[NUM_LEDS-i-1] = CRGB(0, 0, 0);
+      leds[i] = CRGB(0, 0, 0);
     }
     else {
       CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,30,150));
-      leds[NUM_LEDS_HALF-i-1] = color;
-      leds[NUM_LEDS_HALF+i] = color;
+      leds[NUM_LEDS-i-1] = color;
+      leds[i] = color;
     }
   }
  
   // Draw peak dot  
   if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
     CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,30,150));
-    leds[NUM_LEDS_HALF-peak-1] = color;
-    leds[NUM_LEDS_HALF+peak] = color;
+    leds[NUM_LEDS-peak-1] = color;
+    leds[peak] = color;
   }
   
    FastLED.show(); // Update strip
@@ -207,21 +207,21 @@ void vu6()
   
   for(int i=0; i<NUM_LEDS_HALF; i++) {
     if(i >= height) {              
-      leds[NUM_LEDS_HALF-i-1] = CRGB(0, 0, 0);
-      leds[NUM_LEDS_HALF+i] = CRGB(0, 0, 0);
+      leds[NUM_LEDS-i-1] = CRGB(0, 0, 0);
+      leds[i] = CRGB(0, 0, 0);
     }
     else {
       CRGB color = getColorFromWheel(map(i,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-      leds[NUM_LEDS_HALF-i-1] = color;
-      leds[NUM_LEDS_HALF+i] = color;
+      leds[NUM_LEDS-i-1] = color;
+      leds[i] = color;
     }
   }
  
   // Draw peak dot  
   if(peak > 0 && peak <= NUM_LEDS_HALF-1) {
     CRGB color = getColorFromWheel(map(peak,0,NUM_LEDS_HALF-1,(int)greenOffset, (int)blueOffset));
-    leds[NUM_LEDS_HALF-peak-1] = color;
-    leds[NUM_LEDS_HALF+peak] = color;
+    leds[NUM_LEDS-peak-1] = color;
+    leds[peak] = color;
   }
   
    FastLED.show(); // Update strip
