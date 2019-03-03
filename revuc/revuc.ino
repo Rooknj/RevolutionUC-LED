@@ -50,22 +50,22 @@ void loop()
   case 0:
     break;
   case 1:
-    dance1();
+    standardVu();
     break;
   case 2:
-    dance2();
+    standardVuGradient();
     break;
   case 3:
-    dance3();
+    centerVu();
     break;
   case 4:
-    dance4();
+    centerVuGradient();
     break;
   case 5:
-    dance5();
+    edgeVu();
     break;
   case 6:
-    dance6();
+    edgeVuGradient();
     break;
   }
   handleButton();
@@ -74,7 +74,7 @@ void loop()
 //*******************************************************************************
 // Helper Functions
 //*******************************************************************************
-void dance1()
+void standardVu()
 {
   calculatePeakAndHeight(TOP);
   // Color pixels based on rainbow gradient
@@ -91,7 +91,7 @@ void dance1()
   FastLED.show(); // Update strip
 }
 
-void dance2()
+void standardVuGradient()
 {
   calculatePeakAndHeight(TOP);
 
@@ -122,7 +122,7 @@ void dance2()
   FastLED.show(); // Update strip
 }
 
-void dance3()
+void centerVu()
 {
   calculatePeakAndHeight(TOP / 2);
   for (int i = 0; i < NUM_LEDS_HALF; i++)
@@ -151,7 +151,7 @@ void dance3()
   FastLED.show(); // Update strip
 }
 
-void dance4()
+void centerVuGradient()
 {
   calculatePeakAndHeight(TOP / 2);
 
@@ -188,7 +188,7 @@ void dance4()
   FastLED.show(); // Update strip
 }
 
-void dance5()
+void edgeVu()
 {
   calculatePeakAndHeight(TOP / 2);
   for (int i = 0; i < NUM_LEDS_HALF; i++)
@@ -217,7 +217,7 @@ void dance5()
   FastLED.show(); // Update strip
 }
 
-void dance6()
+void edgeVuGradient()
 {
   calculatePeakAndHeight(TOP / 2);
 
