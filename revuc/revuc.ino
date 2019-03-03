@@ -6,21 +6,22 @@
 #define NUM_LEDS 20 // Number of LEDS in your strip
 #define DATA_PIN 5 // Pin 5 on ESP8266
 #define buttonPin 6
-#define ANALOG_READ 0 //The pin that we read sensor values form
+#define ANALOG_READ A5 //The pin that we read sensor values form
 
 // Globals
 CRGB leds[NUM_LEDS]; // LED array
-bool powerOn = false; // are leds On or Off
+bool powerOn = true; // are leds On or Off
 
 //*******************************************************************************
 // Setup
 //*******************************************************************************
 void setup() { 
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(50);
-  setRGB(0,0,0);
+  FastLED.setBrightness(255);
+  setRGB(255,0,0);
   Serial.begin(115200);
   pinMode(buttonPin, INPUT);
+  analogReference(EXTERNAL);
 }
 
 //*******************************************************************************
@@ -30,9 +31,9 @@ void setup() {
 void loop() 
 {
   unsigned int micSample = getMicSample();
-  unsigned int brightness = map(micSample, 13 , 756, 0, 255);
-  FastLED.setBrightness(brightness);
-  FastLED.show();
+  unsigned int brightness = map(micSample, 0 , 1024, 0, 100);
+  //FastLED.setBrightness(brightness);
+  //FastLED.show();
   Serial.println(brightness);
   handleToggle();
 }
@@ -105,7 +106,7 @@ unsigned int getMicSample() {
    unsigned int peakToPeak = 0;   // peak-to-peak level
 
    unsigned int signalMax = 0;
-   unsigned int signalMin = 756;
+   unsigned int signalMin = 1024;
 
    // collect data for 50 mS
    while (millis() - startMillis < sampleWindow)
